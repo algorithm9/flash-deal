@@ -1,0 +1,9 @@
+version: "2"
+sql:
+  - engine: "mysql"
+    schema: "migrations/schema.sql"  # 数据库 schema 文件路径
+    queries: "queries/query.sql"     # SQL 查询文件路径
+    gen:
+      go:
+        package: "db"                    # 生成的 Go 包名
+        out: "models"                # 生成的 Go 文件输出路径
