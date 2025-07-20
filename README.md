@@ -9,41 +9,7 @@ If you're interested in using FlashDeal in a commercial setting or need custom f
 📧 Email: algorithm9@163.com
 
 ## 架构图
-```mermaid
-flowchart TD
-    Client[客户端] -->|HTTP请求| APIServer[API服务]
-    
-    subgraph APIServer
-        GinRouter[Gin路由] --> Middleware[JWT认证]
-        Middleware --> SeckillHandler[秒杀接口]
-    end
-    
-    subgraph 业务逻辑层
-        SeckillHandler --> SeckillService[秒杀服务]
-        SeckillService -->|1. 检查库存| RedisClient[Redis客户端]
-        SeckillService -->|2. 扣减库存| RedisClient
-        SeckillService -->|3. 发送订单消息| Kafka[(Kafka)]
-    end
-    
-    subgraph 数据层
-        RedisClient --> Redis[(Redis缓存)]
-        EntORM[Ent ORM] --> MySQL[(MySQL)]
-    end
-    
-    subgraph 异步处理
-        Kafka --> WorkerServer[Worker服务]
-        WorkerServer -->|消费消息| OrderService[订单服务]
-        OrderService -->|写入订单| EntORM
-    end
-    
-    subgraph 基础设施
-        Config[配置中心] --> APIServer
-        Logger[日志系统] --> APIServer
-    end
-    
-    style Redis fill:#f96,stroke:#333
-    style Kafka fill:#69f,stroke:#333
-```
+![system.svg](system.svg)
 
 ### 架构说明：
 
@@ -54,3 +20,11 @@ flowchart TD
 5. 基础设施 ：包含配置中心、日志系统和Kafka消息队列
 6. Worker服务 ：独立部署的消费者服务，处理Kafka中的异步任务
    秒杀核心流程：用户请求 → API层 → 秒杀服务 → Redis扣减库存 → 发送订单消息到Kafka → Worker消费消息完成订单入库
+
+### 架构特征：
+
+1. 分层结构：API层→业务层→数据层
+2. 模块化设计：通过internal/module实现业务解耦
+3. 基础设施：集中管理配置/日志/消息队列
+4. 数据访问：使用Ent ORM统一管理MySQL和Redis
+5. 安全机制：JWT鉴权中间件保护API端点
