@@ -9,7 +9,7 @@ If you're interested in using FlashDeal in a commercial setting or need custom f
 📧 Email: algorithm9@163.com
 
 ## 架构图
-![system.svg](system.svg)
+![system.png](system.png)
 
 ### 架构说明：
 
